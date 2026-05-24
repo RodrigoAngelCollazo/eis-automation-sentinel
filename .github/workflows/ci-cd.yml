@@ -1,0 +1,31 @@
+name: Sentinel CI Automation Loop
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pytest-cov pydantic psycopg2-binary
+
+    - name: Validate config.json syntax
+      run: python -m json.tool config.json
+
+    - name: Run test suite
+      run: |
+        python -m pytest tests/ --cov=sentinel --cov-report=term-missing

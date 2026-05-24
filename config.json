@@ -1,0 +1,4 @@
+{
+    "max_allowed_drift": 0.05,
+    "latency_sla_ms": 450
+}
