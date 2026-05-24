@@ -1,5 +1,7 @@
 {
   "drift_limit": 0.25,
   "confidence_threshold": 0.80,
-  "latency_limit_ms": 100.0
+  "latency_limit_ms": 100.0,
+  "min_tps_threshold": 15.0,
+  "max_context_ratio": 0.90
 }
