@@ -1,0 +1,5 @@
+{
+  "drift_limit": 0.25,
+  "confidence_threshold": 0.80,
+  "latency_limit_ms": 100.0
+}
