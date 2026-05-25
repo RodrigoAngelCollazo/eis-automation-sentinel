@@ -3,5 +3,13 @@
   "confidence_threshold": 0.80,
   "latency_limit_ms": 100.0,
   "min_tps_threshold": 15.0,
-  "max_context_ratio": 0.90
+  "max_context_ratio": 0.90,
+  "emission_factors": {
+    "diesel_fuel_kg_co2e_per_liter": 2.68,
+    "electricity_kg_co2e_per_kwh": 0.45,
+    "raw_material_kg_co2e_per_kg": 1.5,
+    "transport_kg_co2e_per_km": 0.12,
+    "disposal_kg_co2e_per_kg": 0.8
+  },
+  "org_carbon_ceiling_kg_co2e": 10000.0
 }
