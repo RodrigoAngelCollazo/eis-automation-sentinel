@@ -1,5 +1,6 @@
 import unittest
 import os
+from pydantic import ValidationError
 from sentinel.guard import SentinelGuard
 
 class TestSentinelGuard(unittest.TestCase):
@@ -17,7 +18,9 @@ class TestSentinelGuard(unittest.TestCase):
         payload = {
             "drift": 0.15,
             "confidence": 0.90,
-            "latency": 45.0
+            "latency": 45.0,
+            "tokens_per_second": 25.0,
+            "context_utilization": 0.4
         }
         self.assertTrue(self.guard.evaluate_payload(payload))
 
@@ -28,7 +31,9 @@ class TestSentinelGuard(unittest.TestCase):
         payload = {
             "drift": 0.30,  # config limit: 0.25
             "confidence": 0.90,
-            "latency": 45.0
+            "latency": 45.0,
+            "tokens_per_second": 25.0,
+            "context_utilization": 0.4
         }
         self.assertFalse(self.guard.evaluate_payload(payload))
 
@@ -39,7 +44,9 @@ class TestSentinelGuard(unittest.TestCase):
         payload = {
             "drift": 0.15,
             "confidence": 0.90,
-            "latency": 120.0  # config limit: 100.0 ms
+            "latency": 120.0,  # config limit: 100.0 ms
+            "tokens_per_second": 25.0,
+            "context_utilization": 0.4
         }
         self.assertFalse(self.guard.evaluate_payload(payload))
 
@@ -60,7 +67,9 @@ class TestSentinelGuard(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.guard.evaluate_payload({
                 "drift": 0.15,
-                "latency": 45.0
+                "latency": 45.0,
+                "tokens_per_second": 25.0,
+                "context_utilization": 0.4
             })
 
         # Constraint 3: Non-numeric value type for 'latency' (string instead of float/int)
@@ -68,7 +77,9 @@ class TestSentinelGuard(unittest.TestCase):
             self.guard.evaluate_payload({
                 "drift": 0.15,
                 "confidence": 0.90,
-                "latency": "fast"
+                "latency": "fast",
+                "tokens_per_second": 25.0,
+                "context_utilization": 0.4
             })
 
         # Constraint 4: Out of range confidence value (e.g. 1.5)
@@ -76,5 +87,26 @@ class TestSentinelGuard(unittest.TestCase):
             self.guard.evaluate_payload({
                 "drift": 0.15,
                 "confidence": 1.5,
-                "latency": 45.0
+                "latency": 45.0,
+                "tokens_per_second": 25.0,
+                "context_utilization": 0.4
             })
+
+    def test_carbon_footprint_calculation(self):
+        """
+        Verifies that the math processing functions scale correctly for GHG metrics.
+        100L fuel (2.31 kg/L) + 100kWh (0.35 kg/kWh) = 231 + 35 = 266.0 kg CO2e.
+        """
+        from sentinel.guard import EnvironmentalTelemetryGuard
+        metrics = EnvironmentalTelemetryGuard(scope1_fuel_liters=100.0, scope2_kwh=100.0)
+        self.assertAlmostEqual(metrics.calculate_total_co2e, 266.0)
+
+    def test_carbon_footprint_overage_breach(self):
+        """
+        Asserts that greenhouse gas emission overages (> 500.0 kg CO2e) break the Pydantic guard gate.
+        200L fuel (462 kg) + 200kWh (70 kg) = 532 kg CO2e.
+        """
+        from sentinel.guard import EnvironmentalTelemetryGuard
+        with self.assertRaises(ValidationError) as cm:
+            EnvironmentalTelemetryGuard(scope1_fuel_liters=200.0, scope2_kwh=200.0)
+        self.assertIn("CRITICAL ENVIRONMENTAL BREACH", str(cm.exception))
