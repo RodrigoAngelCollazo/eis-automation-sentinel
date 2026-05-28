@@ -1,61 +1,70 @@
-# Enterprise Carbon Footprint Ingestion Engine
+# ISO 14001 Environmental Management System (EMS) Gateway
 
-[![Compliance Matrix Status](https://img.shields.io/badge/Compliance-ISO%2014064%20%7C%20ISO%2014067-blue)](https://github.com/RodrigoAngelCollazo/carbon-footprint-engine)
-[![Audit Audit Trail Status](https://img.shields.io/badge/Data%20Quality-100%25-success)](https://github.com/RodrigoAngelCollazo/carbon-footprint-engine)
+[![Compliance Framework](https://img.shields.io/badge/Compliance-ISO%2014001%20%7C%2014064%20%7C%2014067-emerald)](https://github.com/RodrigoAngelCollazo/carbon-footprint-engine)
+[![Data Quality Integrity](https://img.shields.io/badge/Data%20Quality-100%25-success)](https://github.com/RodrigoAngelCollazo/carbon-footprint-engine)
 
-A high-integrity, Test-Driven Development (TDD) data governance gateway built under a **Process-as-Code** methodology. This engine ingests, structures, and audits incoming emissions telemetry data, providing structural validation against strict international carbon standards before committing telemetry metrics to long-term storage.
-
----
-
-## 🏗️ Compliance Data Pipeline Architecture
-
-              [ Streaming Emission Telemetry ]
-                             │
-                             ▼
-     ┌────────────────────────────────────────────────┐
-     │          sentinel/guard.py (Pydantic)          │
-     ├────────────────────────────────────────────────┤
-     │ ✔ ISO 14067: Cradle-to-Grave Product LCA Bounds│
-     │ ✔ ISO 14064: Corporate Scope 1, 2, & 3 Auditing│
-     └───────────────────────┬────────────────────────┘
-                             │
-              ┌──────────────┴──────────────┐
-              ▼                             ▼
-   [ Compliant Payload ]          [ Audit Compliance Breach ]
-              │                             │
-              ▼                             ▼
-┌─────────────────────────────┐┌─────────────────────────────┐
-│  Execute DB Upsert Merge    ││  Raise Explicit ValueError  │
-│  (TimescaleDB Staging Sync) ││  (Drop Payload & Alert Log) │
-└─────────────────────────────┘└─────────────────────────────┘
-
-
-The system separates incoming tracking models into distinct operational layers to maintain data lineage from raw ingestion right through downstream analytics nodes.
+An enterprise-grade, Test-Driven Development (TDD) data governance gateway engineered to operationalize **ISO 14001** compliance under strict **Process-as-Code** principles. This sentinel serves as an automated regulatory gatekeeper—intercepting facility operational data to monitor legal compliance, evaluate environmental aspects, and validate continuous improvement targets before committing telemetry matrices to long-term storage.
 
 ---
 
-## 📊 Implemented International Standards
+## 🔄 The ISO 14001 Continuous Improvement Loop (PDCA)
 
-The validation layer dynamically checks schemas against standardized carbon protocol matrices:
+Rather than acting as a static accounting tool, this engine integrates directly into an organization's **Plan-Do-Check-Act (PDCA)** cycle to systematically minimize overall environmental impact:
 
-### 1. ISO 14067 — Product Carbon Footprint (PCF)
-Tracks life cycle assessment data points across all standard lifecycle stages:
-* **`raw_material_kg`**: Upstream resource extraction mass footprint tracking.
-* **`production_processing_kwh`**: Utility and manufacturing power draw conversion tracking.
-* **`distribution_transport_km`**: Logistics supply chain transport distance metrics.
-* **`end_of_life_disposal_kg`**: Final decomposition processing emissions mapping.
+     [ PLAN ] ──► Define Targets & Legal Requirements
+        ▲                                 │
+        │                                 ▼
+     [ ACT ]                      [ DO ] Operational Ingestion
+        ▲                                 │
+        │                                 ▼
+        └───────── [ CHECK ] ◄────────────┘
+            sentinel/guard.py Validation Gate
 
-### 2. ISO 14064 — Organizational Greenhouse Gas Inventories
-Establishes corporate ecosystem tracking boundaries to log organizational impacts:
-* **Scope 1 (Direct Emissions):** Tracks site-specific stationary fuel combustion variables (`scope1_direct_combustion_liters`).
-* **Scope 2 (Indirect Emissions):** Monitors purchased energy, electricity, and local grid load draws (`scope2_indirect_electricity_kwh`).
-* **Scope 3 (Value Chain):** Captures upstream and downstream indirect supply chain metrics (`scope3_value_chain_emissions_co2e`).
+The data pipeline processes incoming records through an isolated validation cycle. If an organization's real-time footprints fail to align with their defined ISO 14001 continuous improvement targets, or if a legal regulatory threshold is crossed, the engine triggers an automatic non-conformance flag.
+
+---
+
+## 🏗️ Technical Pipeline Architecture
+
+             [ Raw Facility & Emission Telemetry ]
+                               │
+                               ▼
+    ┌─────────────────────────────────────────────────────┐
+    │             sentinel/guard.py (EMS Gate)            │
+    ├─────────────────────────────────────────────────────┤
+    │ ✔ ISO 14001: Overarching Governance & Legal Status  │
+    │   └── ✔ ISO 14064: Corporate Scope 1 / 2 / 3 Quant  │
+    │   └── ✔ ISO 14067: Lifecycle Product Carbon LCA     │
+    └──────────────────────────┬──────────────────────────┘
+                               │
+                ┌──────────────┴──────────────┐
+                ▼                             ▼
+     [ EMS Conformance ]             [ ISO Non-Conformance ]
+                │                             │
+                ▼                             ▼
+ ┌─────────────────────────────┐┌─────────────────────────────┐
+ │   TimescaleDB Staging Sync  ││  Raise Explicit ValueError  │
+ │  (Commit & Proceed to Act)  ││  (Drop Payload & Alert Log) │
+ └─────────────────────────────┘└─────────────────────────────┘
+
+---
+
+## 📋 Implemented Governance & Metric Standards
+
+### 🛡️ Core Framework: ISO 14001 (Environmental Management)
+The master validation schema targets organizational lifecycle improvement and legal compliance verification:
+* **`legal_compliance_status`**: Enforces strict boolean verification against localized pollution and emission regulatory frameworks.
+* **`environmental_aspects`**: Dynamic tracking matrix handling multi-vector waste footprints (solid waste mass, processing effluents).
+* **`continuous_improvement_target_co2e`**: Programmable carbon ceiling caps that automatically scale downward year-over-year to enforce absolute impact minimization.
+
+### 📊 Metric Engines Nested Under the Framework
+1. **ISO 14064 (Organizational GHG Inventories):** Audits corporate boundary carbon footprints across Scope 1 (Direct Combustion), Scope 2 (Indirect Electricity), and Scope 3 (Value Chain Dynamics).
+2. **ISO 14067 (Product Carbon Footprint - PCF):** Tracks cradle-to-grave lifecycle performance from raw materials processing through to product distribution and final disposal.
 
 ---
 
 ## 📂 System Manifest
 
-* `sentinel/guard.py` — Immutable Pydantic baseline validation schemas for ISO mapping frameworks.
-* `config.json` — Static lookup matrix defining current IPCC greenhouse global emission coefficients.
-* `tests/` — Test suites asserting rigorous mathematical calculation bounds for structural boundary exceptions.
-* `pyproject.toml` — Automation runner configuration settings for local pipeline testing routines.
+* `sentinel/guard.py` — Immutable Pydantic baseline validation schemas executing the combined ISO framework validations.
+* `config.json` — Static lookup matrix defining localized grid emission parameters and regulatory thresholds.
+* `tests/` — Comprehensive TDD suites ensuring non-conformance boundaries trigger alerts accurately.
