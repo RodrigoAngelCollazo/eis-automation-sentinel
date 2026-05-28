@@ -71,20 +71,41 @@ class OrganizationalGHGISO14064(BaseModel):
                 raise ValueError(f"AUDIT COMPLIANCE BREACH: Missing mandatory field '{field}'")
         return data
 
-    @model_validator(mode='after')
-    def verify_organizational_ceiling(self) -> 'OrganizationalGHGISO14064':
+    def get_total_emissions(self) -> float:
         config = load_config()
         factors = config.get("emission_factors", {})
-        ceiling = config.get("org_carbon_ceiling_kg_co2e", float('inf'))
 
-        total_emissions = (
+        return (
             self.scope1_direct_combustion_liters * factors.get("diesel_fuel_kg_co2e_per_liter", 0.0) +
             self.scope2_indirect_electricity_kwh * factors.get("electricity_kg_co2e_per_kwh", 0.0) +
             self.scope3_value_chain_emissions_co2e
         )
 
+    @model_validator(mode='after')
+    def verify_organizational_ceiling(self) -> 'OrganizationalGHGISO14064':
+        config = load_config()
+        ceiling = config.get("org_carbon_ceiling_kg_co2e", float('inf'))
+        total_emissions = self.get_total_emissions()
+
         if total_emissions > ceiling:
             raise ValueError(f"AUDIT COMPLIANCE BREACH: Total organizational emissions ({total_emissions:.2f}) exceed the environmental carbon ceiling of {ceiling} kg CO2e")
+
+        return self
+
+class EMSAuditISO14001(BaseModel):
+    legal_compliance_status: bool
+    environmental_aspects: dict
+    continuous_improvement_target_co2e: float
+    current_inventory: OrganizationalGHGISO14064
+
+    @model_validator(mode='after')
+    def validate_ems_conformance(self) -> 'EMSAuditISO14001':
+        if not self.legal_compliance_status:
+            raise ValueError("ISO 14001 NON-CONFORMANCE: Legal compliance status is flagged as false.")
+
+        total_emissions = self.current_inventory.get_total_emissions()
+        if total_emissions > self.continuous_improvement_target_co2e:
+            raise ValueError(f"ISO 14001 NON-CONFORMANCE: Current emissions ({total_emissions:.2f}) exceed continuous improvement target ({self.continuous_improvement_target_co2e:.2f})")
 
         return self
 
